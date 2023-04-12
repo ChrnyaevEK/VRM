@@ -227,6 +227,8 @@ class VisControl(BaseControl):
             self.display_workspace(0)
         """
 
+        raise NotImplementedError('Not implemented for 3 joints')
+
         # Generate linearly spaced vectors for the each of joints.
         theta_1 = np.linspace(
             (self.ax_wr[0][0]) * (np.pi/180), (self.ax_wr[0][1]) * (np.pi/180), 100)
