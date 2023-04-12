@@ -25,44 +25,47 @@ File Name: main.py
 ## =========================================================================== ## 
 """
 
+
 # System (Default Lib.)
 import sys
 # Own library for robot control (kinematics), visualization, etc. (See manipulator.py)
-import manipulator
+import manipulator as m
+
+# Test Results (Select one of the options FK, IK, BOTH)
+test_kin = 'IK'
+
+fk_test_pose = [0.0, 0.0, 0.0]
+ik_test_pose = [200, 100]
 
 
 def main():
-    # Initial Parameters -> ABB IRB910SC 
+    # Initial Parameters -> ABB IRB910SC
     # Product Manual: https://search.abb.com/library/Download.aspx?DocumentID=3HAC056431-001&LanguageCode=en&DocumentPartId=&Action=Launch
 
-    # Working range (Axis 1, Axis 2)
-    axis_wr = [[-140.0, 140.0],[-150.0, 150.0]]
-    # Length of Arms (Link 1, Link2)
-    arm_length = [250.0, 200.0]
+    # Working range (Axis 1, Axis 2, ...)
+    axis_wr = [[-140.0, 140.0], [-150.0, 150.0], [-150.0, 150.0]]
+    joints = [0.0, 0.0, 0.0]
+    # Length of Arms (Link 1, Link2, ...)
+    arm_length = [250.0, 200.0, 100.0]
 
     # DH (Denavit-Hartenberg) parameters
-    theta_0 = [0.0, 0.0]
-    a       = [0.0, 0.0]
-    d       = [0.0, 0.0]
-    alpha   = [0.0, 0.0]
 
     # Initialization of the Class (Control Manipulator)
     # Input:
     #   (1) Robot name         [String]
-    #   (2) DH Parameters      [DH_parameters Structure]
-    #   (3) Axis working range [Float Array]
-    scara = manipulator.Control('ABB IRB 910SC (SCARA)', manipulator.DH_parameters(theta_0, a, d, alpha), axis_wr)
+    #   (2) Axis working range [Float Array]
+    #   (3) Arm lengths        [Float Array]
 
-    # Test Results (Select one of the options -> See below)
-    test_kin = 'BOTH'
+    scara = m.ScaraControl('ABB IRB 910SC (SCARA)',
+                           axis_wr, arm_length, joints)
 
     if test_kin == 'FK':
-        scara.forward_kinematics(0, [0.0, 45.0], True)
+        scara.forward_kinematics(0, fk_test_pose, True)
     elif test_kin == 'IK':
-        scara.inverse_kinematics([0.4767767, 0.1767767],0)
+        scara.inverse_kinematics(ik_test_pose, 0)
     elif test_kin == 'BOTH':
-        scara.forward_kinematics(0, [0.0, 45.0], True)
-        scara.inverse_kinematics(scara.p, 1)
+        scara.forward_kinematics(0, fk_test_pose, True)
+        scara.inverse_kinematics(scara.ee_pose, 1)
 
     # 1. Display the entire environment with the robot and other functions.
     # 2. Display the work envelope (workspace) in the environment (depends on input).
@@ -70,7 +73,8 @@ def main():
     #  (1) Work Envelop Parameters
     #       a) Visible                   [BOOL]
     #       b) Type (0: Mesh, 1: Points) [INT]
-    scara.display_environment([True, 0])
+    scara.display_environment([False, 0])
+
 
 if __name__ == '__main__':
     sys.exit(main())
